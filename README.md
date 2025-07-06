@@ -3,13 +3,6 @@
 A full-stack AirBNB-inspired web application for listing, searching, and reviewing rental properties and holiday destination spots.  
 Built with Node.js, Express, MongoDB, EJS, and deployed on [Render](https://airbnb-wiu9.onrender.com/listings).
 
----
-## 🎬 Demo
-
-![Website Demo](demo.gif)
-<!-- Replace the above path with the actual path or URL to your GIF demo -->
-
----
 
 ## ✨ Features
 
@@ -22,9 +15,8 @@ Built with Node.js, Express, MongoDB, EJS, and deployed on [Render](https://airb
 - Responsive design with Bootstrap
 - Interactive maps with Mapbox
 - 
-### Feature to be Added:
+### Features to be Added:
 - Search and Filter listings
----
 
 ## 🛠️ Technologies Used
 
@@ -38,3 +30,7 @@ Built with Node.js, Express, MongoDB, EJS, and deployed on [Render](https://airb
 - Render (deployment)
 
 ---
+## 🎬 Demo
+
+![Website Demo](demo2.gif)
+<!-- Replace the above path with the actual path or URL to your GIF demo -->
