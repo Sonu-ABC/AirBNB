@@ -1,4 +1,4 @@
-# 🏖️ MajorProjectAirBNB
+# 🏖️ Project Air BNB
 
 A full-stack AirBNB-inspired web application for listing, searching, and reviewing rental properties and holiday destination spots.  
 Built with Node.js, Express, MongoDB, EJS, and deployed on [Render](https://airbnb-wiu9.onrender.com/listings).
