@@ -10,11 +10,18 @@
     margin-right: 2rem;
     margin-top: 2rem;
     opacity: 0.7;
-    
-   }
-   .filter:hover{
-    opacity: 1;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+   }
+   .filter:hover, .filter.active{
+    opacity: 1;
+    color: #fe424d;
+   }
+   .filter.active p {
+    font-weight: 700;
+    border-bottom: 2px solid #fe424d;
+    padding-bottom: 2px;
    }
    .filter p{
     font-size: 0.8rem;
@@ -30,62 +37,109 @@
     margin-left: 2rem;
     display:flex;
     align-items: center;
-}
+  }
+  .search-result-banner {
+    margin-top: 1rem;
+    padding: 10px 16px;
+    background: #fff5f5;
+    border-left: 4px solid #fe424d;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .search-result-banner a {
+    color: #fe424d;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 13px;
+  }
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #888;
+  }
+  .no-results i { font-size: 48px; margin-bottom: 16px; color: #ddd; }
+  .no-results h4 { color: #555; }
 </style>
 
     <div id="filters">
-       <div class="filter">
+       <!-- Each filter links to /listings?category=KEYWORD -->
+       <a href="/listings?category=trending" class="filter <%= category === 'trending' ? 'active' : '' %>">
          <div><i class="fa-solid fa-fire"></i></div>
          <p>Trending</p>
-       </div>
-       <div class="filter">
+       </a>
+       <a href="/listings?category=room" class="filter <%= category === 'room' ? 'active' : '' %>">
          <div><i class="fa-solid fa-bed"></i></div>
          <p>Rooms</p>
-       </div>
-       <div class="filter">
+       </a>
+       <a href="/listings?category=farm" class="filter <%= category === 'farm' ? 'active' : '' %>">
          <div><i class="fa-solid fa-wheat-awn"></i></div>
          <p>Farms</p>
-       </div>
-       <div class="filter">
+       </a>
+       <a href="/listings?category=view" class="filter <%= category === 'view' ? 'active' : '' %>">
          <div><i class="fa-solid fa-camera-retro"></i></div>
          <p>Amazing Views</p>
-       </div>
-       <div class="filter">
+       </a>
+       <a href="/listings?category=cabin" class="filter <%= category === 'cabin' ? 'active' : '' %>">
          <div><i class="fa-solid fa-person-shelter"></i></div>
          <p>Cabin</p>
-       </div>
-       <div class="filter">
+       </a>
+       <a href="/listings?category=beach" class="filter <%= category === 'beach' ? 'active' : '' %>">
          <div><i class="fa-solid fa-umbrella-beach"></i></div>
          <p>Beach</p>
-       </div>
-       <div class="filter">
+       </a>
+       <a href="/listings?category=pool" class="filter <%= category === 'pool' ? 'active' : '' %>">
          <div><i class="fa-solid fa-water-ladder"></i></div>
          <p>Amazing Pools</p>
-       </div>
-       <div class="filter">
+       </a>
+       <a href="/listings?category=city" class="filter <%= category === 'city' ? 'active' : '' %>">
          <div><i class="fa-solid fa-tree-city"></i></div>
          <p>Iconic City</p>
-       </div>
-       <div class="filter">
+       </a>
+       <a href="/listings?category=lake" class="filter <%= category === 'lake' ? 'active' : '' %>">
          <div><i class="fa-solid fa-house-flood-water"></i></div>
          <p>Lakefront</p>
-       </div>
-        <div class="filter">
+       </a>
+       <a href="/listings?category=castle" class="filter <%= category === 'castle' ? 'active' : '' %>">
          <div><i class="fa-solid fa-chess-rook"></i></div>
          <p>Castles</p>
-       </div>
-        <div class="filter">
+       </a>
+       <a href="/listings?category=omg" class="filter <%= category === 'omg' ? 'active' : '' %>">
          <div><i class="fa-solid fa-gift"></i></div>
          <p>OMG!</p>
-       </div>
+       </a>
 
        <div class="tax-toggle">
         <div class="form-check-reverse form-switch">
         <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
         <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
-</div>
+      </div>
        </div>
     </div>
+
+<!-- Search / Category result banner -->
+<% if (search && search.trim()) { %>
+  <div class="search-result-banner">
+    <span>Showing results for: <strong>"<%= search %>"</strong> &nbsp;(<%= allListings.length %> found)</span>
+    <a href="/listings">✕ Clear search</a>
+  </div>
+<% } else if (category && category.trim()) { %>
+  <div class="search-result-banner">
+    <span>Filtered by category: <strong><%= category %></strong> &nbsp;(<%= allListings.length %> found)</span>
+    <a href="/listings">✕ Clear filter</a>
+  </div>
+<% } %>
+
+<% if (allListings.length === 0) { %>
+  <div class="no-results">
+    <div><i class="fa-solid fa-magnifying-glass"></i></div>
+    <h4>No listings found</h4>
+    <p>Try a different search term or browse all listings.</p>
+    <a href="/listings" class="btn btn-outline-danger mt-2">View All Listings</a>
+  </div>
+<% } else { %>
 <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
    <% for(let listing of allListings) {%>
      <a href="/listings/<%= listing._id %>" class="listing-link" >
@@ -93,7 +147,9 @@
   <img src="<%=listing.image.url  %>" 
   class="card-img-top" 
   alt="listing image" 
-  style="height: 20rem;">
+  style="height: 20rem;"
+  loading="lazy"
+  decoding="async">
 
   <div class="card-img-overlay"></div>
   <div class="card-body">
@@ -107,6 +163,7 @@
 </a>
        <% } %>
    </div>
+<% } %>
     
 <script>
   let taxSwitch = document.getElementById("switchCheckDefault");
@@ -121,5 +178,4 @@
       }
   });
 </script>
-
 

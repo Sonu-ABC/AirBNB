@@ -1,0 +1,141 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  .otp-card {
+    max-width: 460px;
+    margin: 60px auto;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.10);
+    background: #fff;
+    text-align: center;
+  }
+  .otp-icon {
+    font-size: 52px;
+    margin-bottom: 10px;
+  }
+  .otp-card h2 {
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 6px;
+  }
+  .otp-card p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .otp-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .otp-inputs input {
+    width: 48px;
+    height: 58px;
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+    color: #222;
+  }
+  .otp-inputs input:focus {
+    border-color: #fe424d;
+    box-shadow: 0 0 0 3px rgba(254,66,77,0.15);
+  }
+  .btn-verify {
+    background: #fe424d;
+    color: #fff;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .btn-verify:hover {
+    background: #d93540;
+  }
+  .resend-link {
+    display: block;
+    margin-top: 18px;
+    font-size: 13px;
+    color: #888;
+  }
+  .resend-link a {
+    color: #fe424d;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .resend-link a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="otp-card">
+  <div class="otp-icon">📧</div>
+  <h2>Verify Your Email</h2>
+  <p>We've sent a 6-digit OTP to your email address.<br>It is valid for <strong>10 minutes</strong>.</p>
+
+  <form action="/verify-otp" method="POST" id="otpForm">
+    <div class="otp-inputs">
+      <input type="text" maxlength="1" class="otp-box" id="otp1" autofocus />
+      <input type="text" maxlength="1" class="otp-box" id="otp2" />
+      <input type="text" maxlength="1" class="otp-box" id="otp3" />
+      <input type="text" maxlength="1" class="otp-box" id="otp4" />
+      <input type="text" maxlength="1" class="otp-box" id="otp5" />
+      <input type="text" maxlength="1" class="otp-box" id="otp6" />
+    </div>
+    <!-- Hidden field that gets populated with the full OTP on submit -->
+    <input type="hidden" name="otp" id="otpHidden" />
+    <button type="submit" class="btn-verify">Verify & Continue</button>
+  </form>
+
+  <span class="resend-link">
+    Didn't receive it? <a href="/signup">Sign up again</a> to resend.
+  </span>
+</div>
+
+<script>
+  const boxes = document.querySelectorAll(".otp-box");
+
+  boxes.forEach((box, i) => {
+    box.addEventListener("input", (e) => {
+      // Allow only digits
+      box.value = box.value.replace(/\D/, "");
+      if (box.value && i < boxes.length - 1) {
+        boxes[i + 1].focus();
+      }
+    });
+
+    box.addEventListener("keydown", (e) => {
+      if (e.key === "Backspace" && !box.value && i > 0) {
+        boxes[i - 1].focus();
+      }
+    });
+
+    // Handle paste on first box
+    box.addEventListener("paste", (e) => {
+      const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+      boxes.forEach((b, idx) => {
+        b.value = pasted[idx] || "";
+      });
+      boxes[Math.min(pasted.length, 5)].focus();
+      e.preventDefault();
+    });
+  });
+
+  document.getElementById("otpForm").addEventListener("submit", (e) => {
+    const otp = Array.from(boxes).map(b => b.value).join("");
+    document.getElementById("otpHidden").value = otp;
+    if (otp.length < 6) {
+      e.preventDefault();
+      alert("Please enter all 6 digits of the OTP.");
+    }
+  });
+</script>

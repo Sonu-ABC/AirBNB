@@ -27,6 +27,8 @@ const User = require('./models/user.js');
 const listingRouter= require('./routes/listing.js');
 const reviewRouter  = require('./routes/review.js');
 const userRouter = require('./routes/user.js');
+const bookingRouter = require('./routes/booking.js');
+const chatbotRouter = require('./routes/chatbot.js');
 const dbUrl = process.env.ATLASDB_URL;
 
 const store = MongoStore.create({
@@ -62,6 +64,7 @@ app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 app.use(express.static(path.join(__dirname,"public")));
 app.use(express.urlencoded({extended:true}));
+app.use(express.json()); // needed for Razorpay AJAX routes
 app.engine('ejs', ejsMate);
 main()
    .then(() => {
@@ -75,6 +78,13 @@ main()
 
 async function main(){
     await mongoose.connect(dbUrl);
+    // Sync indexes safely — won't crash server if there's a conflict
+    try {
+        await Listing.syncIndexes();
+        console.log("Indexes synced successfully.");
+    } catch(e) {
+        console.log("Index sync skipped:", e.message);
+    }
 }
 
 
@@ -93,7 +103,9 @@ app.use((req, res, next) => {
     res.locals.currUser = req.user;
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
-   // Make currentUser available in all templates
+    // Make search/category safe on all pages (navbar uses these)
+    res.locals.search = req.query.search || "";
+    res.locals.category = req.query.category || "";
     next();
 });
 
@@ -112,6 +124,8 @@ app.get("/", (req, res) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews",reviewRouter);
 app.use("/", userRouter);
+app.use("/", bookingRouter);
+app.use("/", chatbotRouter);
 
 app.use((err,req,res,next)=>{
     let {statusCode=500,message="Something went wrong!"}=err;

@@ -11,17 +11,32 @@
  <img 
     src="<%=listing.image.url%>" 
     class="card-img-top show-img" 
-    alt="listing image">
+    alt="listing image"
+    loading="lazy"
+    decoding="async">
   <div class="card-body">
     <p class="card-text">Owned by <i><%= listing.owner.username %><br></i></p>
 
 
 <p class="card-text"><%= listing.description %></p>
 
-<p class="card-text">&#8377;<%= (listing.price || 0).toLocaleString("en-IN") %></p>
+<p class="card-text">&#8377;<%= (listing.price || 0).toLocaleString("en-IN") %> / night</p>
 <p class="card-text"><%= listing.location %></p>
 <p class="card-text"><%= listing.country %></p>
-    
+
+<% if (currUser && !listing.owner._id.equals(currUser._id)) { %>
+  <a href="/listings/<%= listing._id %>/book" 
+     class="btn btn-danger mt-2 w-100" 
+     style="background:#fe424d; border:none; font-weight:600; padding:10px; font-size:16px; border-radius:8px;">
+     Book Now
+  </a>
+<% } %>
+<% if (!currUser) { %>
+  <a href="/login" class="btn btn-outline-danger mt-2 w-100" 
+     style="font-weight:600; border-radius:8px;">
+    Login to Book
+  </a>
+<% } %>
   </div>
 </div>
 

@@ -10,6 +10,11 @@ module.exports.isLoggedIn = (req, res, next) => {
         req.flash("error", "You must be signed in to do that!");
         return res.redirect("/login");
     }
+    // Check if the user has verified their email
+    if (!req.user.isVerified) {
+        req.flash("error", "Please verify your email first!");
+        return res.redirect("/verify-otp");
+    }
     next();
 };
 
