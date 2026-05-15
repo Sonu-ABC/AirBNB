@@ -1,25 +1,14 @@
 const nodemailer = require("nodemailer");
-const dns = require("dns");
 
-// Force IPv4 DNS resolution — fixes ENETUNREACH on Render (which has no IPv6 support)
-const ipv4Lookup = (hostname, options, callback) => {
-    dns.resolve4(hostname, (err, addresses) => {
-        if (err) return callback(err);
-        callback(null, addresses[0], 4);
-    });
-};
-
+// Using Brevo (Sendinblue) SMTP — works reliably on Render free tier
+// Gmail SMTP is blocked on Render due to IPv6/firewall restrictions
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host: "smtp-relay.brevo.com",  // Brevo's IPv4-only SMTP relay
     port: 587,
-    secure: false,           // STARTTLS on port 587
-    lookup: ipv4Lookup,      // ← Forces IPv4 DNS resolution
+    secure: false,                  // STARTTLS
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-        rejectUnauthorized: false,
+        user: process.env.BREVO_USER, // your Brevo account email
+        pass: process.env.BREVO_PASS, // your Brevo SMTP key (xsmtpsib-...)
     },
 });
 
