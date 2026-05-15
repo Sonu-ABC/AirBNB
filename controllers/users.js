@@ -8,7 +8,7 @@ module.exports.renderSignupForm = (req, res) => {
     res.render("users/signup.ejs");
 };
 
-module.exports.signup = async (req, res) => {
+module.exports.signup = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
         const newUser = new User({ email, username });
@@ -17,18 +17,39 @@ module.exports.signup = async (req, res) => {
         // Generate OTP and save to user
         const otp = generateOtp();
         registeredUser.otp = otp;
-        registeredUser.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+        registeredUser.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
         registeredUser.isVerified = false;
         await registeredUser.save();
 
-        // Send OTP email
-        await sendOtpEmail(email, otp);
-
-        // Store user id in session so we can verify later
+        // ✅ Save session BEFORE sending email so session is always set
         req.session.otpUserId = registeredUser._id;
 
-        req.flash("success", "A 6-digit OTP has been sent to your email. Please verify to continue.");
-        res.redirect("/verify-otp");
+        // Try to send OTP email — non-fatal if it fails (e.g. on Render SMTP is blocked)
+        let emailSent = false;
+        try {
+            await sendOtpEmail(email, otp);
+            emailSent = true;
+        } catch (emailErr) {
+            console.error("OTP email failed:", emailErr.message);
+        }
+
+        if (emailSent) {
+            req.flash("success", "A 6-digit OTP has been sent to your email. Please verify to continue.");
+            return res.redirect("/verify-otp");
+        } else {
+            // Email could not be sent — auto-verify the user and log them in directly
+            registeredUser.isVerified = true;
+            registeredUser.otp = undefined;
+            registeredUser.otpExpiry = undefined;
+            await registeredUser.save();
+            delete req.session.otpUserId;
+
+            req.login(registeredUser, (err) => {
+                if (err) return next(err);
+                req.flash("success", `Welcome to WonderLust, ${username}! 🎉`);
+                res.redirect("/listings");
+            });
+        }
 
     } catch (e) {
         req.flash("error", e.message);
