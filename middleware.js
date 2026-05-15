@@ -11,7 +11,8 @@ module.exports.isLoggedIn = (req, res, next) => {
         return res.redirect("/login");
     }
     // Check if the user has verified their email
-    if (!req.user.isVerified) {
+    // NOTE: isVerified === undefined means old account created before OTP feature — allow them through
+    if (req.user.isVerified === false) {
         req.flash("error", "Please verify your email first!");
         return res.redirect("/verify-otp");
     }
