@@ -1,20 +1,16 @@
 const nodemailer = require("nodemailer");
 
-// Using Brevo (Sendinblue) SMTP — works reliably on Render free tier
-// Gmail SMTP is blocked on Render due to IPv6/firewall restrictions
 const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",  // Brevo's IPv4-only SMTP relay
-    port: 587,
-    secure: false,                  // STARTTLS
+    service: "gmail",
     auth: {
-        user: process.env.BREVO_USER, // your Brevo account email
-        pass: process.env.BREVO_PASS, // your Brevo SMTP key (xsmtpsib-...)
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     },
 });
 
 module.exports.sendOtpEmail = async (toEmail, otp) => {
     const mailOptions = {
-        from: `"WonderLust" <${process.env.BREVO_USER}>`,
+        from: `"WonderLust" <${process.env.EMAIL_USER}>`,
         to: toEmail,
         subject: "Your OTP for WonderLust Registration",
         html: `
@@ -48,7 +44,7 @@ module.exports.sendBookingConfirmationEmail = async (toEmail, username, booking)
     });
 
     const mailOptions = {
-        from: `"WonderLust" <${process.env.BREVO_USER}>`,
+        from: `"WonderLust" <${process.env.EMAIL_USER}>`,
         to: toEmail,
         subject: `Booking Confirmed! Your trip to ${booking.listing.location} 🎉`,
         html: `
