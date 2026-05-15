@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 
 module.exports.sendOtpEmail = async (toEmail, otp) => {
     const mailOptions = {
-        from: `"WonderLust 🏡" <${process.env.EMAIL_USER}>`,
+        from: `"WonderLust" <${process.env.BREVO_USER}>`,
         to: toEmail,
         subject: "Your OTP for WonderLust Registration",
         html: `
@@ -48,7 +48,7 @@ module.exports.sendBookingConfirmationEmail = async (toEmail, username, booking)
     });
 
     const mailOptions = {
-        from: `"WonderLust 🏡" <${process.env.EMAIL_USER}>`,
+        from: `"WonderLust" <${process.env.BREVO_USER}>`,
         to: toEmail,
         subject: `Booking Confirmed! Your trip to ${booking.listing.location} 🎉`,
         html: `
