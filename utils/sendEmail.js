@@ -1,16 +1,25 @@
 const nodemailer = require("nodemailer");
+const dns = require("dns");
+
+// Force IPv4 DNS resolution — fixes ENETUNREACH on Render (which has no IPv6 support)
+const ipv4Lookup = (hostname, options, callback) => {
+    dns.resolve4(hostname, (err, addresses) => {
+        if (err) return callback(err);
+        callback(null, addresses[0], 4);
+    });
+};
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",   // explicit host instead of service:"gmail"
-    port: 465,                 // SSL port
-    secure: true,              // use SSL
-    family: 4,                 // ← CRITICAL: force IPv4 (Render doesn't support IPv6)
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,           // STARTTLS on port 587
+    lookup: ipv4Lookup,      // ← Forces IPv4 DNS resolution
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
     tls: {
-        rejectUnauthorized: false,   // allow self-signed certs in some environments
+        rejectUnauthorized: false,
     },
 });
 
